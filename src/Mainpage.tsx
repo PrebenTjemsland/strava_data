@@ -1,0 +1,53 @@
+import { useNavigate } from 'react-router-dom';
+
+function MainPage({ accessToken, stats, loading, error }: { accessToken: string; stats: any; loading: boolean; error: string | null }) {
+    const navigate = useNavigate();
+
+    const handleConnect = () => {
+        window.location.href = 'http://localhost:5050/authorize';
+    };
+    const formatTime = (seconds: number | null | undefined) => {
+        if (seconds === undefined || seconds === null) {
+            return 'N/A';
+        }
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+
+        const pad = (num: number) => num.toString().padStart(2, '0');
+
+        return `${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+    };
+    return (
+        <div>
+            <h1>Strava Activities Viewer</h1>
+            {!accessToken && <button onClick={handleConnect}>Connect with Strava</button>}{' '}
+            <button onClick={() => navigate('/activities')} disabled={!accessToken}>
+                Go to Activities
+            </button>
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {stats && (
+                <div>
+                    <h2>Total Stats</h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div>
+                            <div style={{ fontSize: 32 }}>🏃</div>
+                            <p>Total Runs: {stats.all_run_totals?.count}</p>
+                            <p>Total Run Distance: {(stats.all_run_totals?.distance / 1000).toFixed(2)} km</p>
+                            <p>Total running time: {formatTime(stats.all_run_totals?.moving_time)}</p>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: 32 }}>🚴</div>
+                            <p>Total Rides: {stats.all_ride_totals?.count}</p>
+                            <p>All Ride Distance: {(stats.all_ride_totals.distance / 1000).toFixed(2)} km</p>
+                            <p>Longest Ride: {(stats.biggest_ride_distance / 1000).toFixed(2)} km</p>
+                            <p>Biggest Climb: {stats.biggest_climb_elevation_gain.toFixed(2)} meter</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+export default MainPage;
