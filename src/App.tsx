@@ -25,8 +25,6 @@ function App() {
                 .then((data) => setStats(data))
                 .catch((err) => setError(err.message))
                 .finally(() => setLoading(false));
-        } else if (!token) {
-            window.location.href = 'http://localhost:5050/authorize';
         }
     }, []);
 
