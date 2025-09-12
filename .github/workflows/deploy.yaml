@@ -22,6 +22,7 @@ jobs:
                   node-version: 20
 
             - name: Install Frontend Dependencies
+              run: pwd
               run: npm install
 
             - name: Build Frontend
