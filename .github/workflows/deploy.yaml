@@ -27,7 +27,7 @@ jobs:
                   port: ${{ secrets.SERVER_PORT }}
                   script: |
                       set -e # Exit immediately if a command exits with a non-zero status.
-                      cd /var/www/strava-app/
+                      cd /var/www/strava-app/strava-data
                       git pull origin main
                       npm install --production
                       pm2 restart strava-app
