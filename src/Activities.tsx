@@ -4,12 +4,15 @@ function Activities({ accessToken }: { accessToken: string }) {
     const [activities, setActivities] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
+    let backendBase = window.location.origin;
+    if (backendBase.match(/:\d+$/)) {
+        backendBase = backendBase.replace(/:\d+$/, ':5050');
+    }
     useEffect(() => {
         if (!accessToken) return;
         setLoading(true);
         setError(null);
-        fetch(`http://localhost:5050/activities?access_token=${accessToken}`)
+        fetch(`http://${backendBase}/api/activities?access_token=${accessToken}`)
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch activities');
                 return res.json();

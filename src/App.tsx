@@ -9,6 +9,11 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    let backendBase = window.location.origin;
+    if (backendBase.match(/:\d+$/)) {
+        backendBase = backendBase.replace(/:\d+$/, ':5050');
+    }
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const token = params.get('access_token');
@@ -17,7 +22,7 @@ function App() {
             setAccessToken(token);
             setLoading(true);
             setError(null);
-            fetch(`http://localhost:5050/athlete_stats?access_token=${token}&athlete_id=${athleteId}`)
+            fetch(`http://${backendBase}/api/athlete_stats?access_token=${token}&athlete_id=${athleteId}`)
                 .then((res) => {
                     if (!res.ok) throw new Error('Failed to fetch stats');
                     return res.json();
