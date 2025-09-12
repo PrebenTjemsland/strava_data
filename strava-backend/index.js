@@ -9,11 +9,13 @@ app.use(cors());
 app.get('/authorize', (req, res) => {
   const clientId = process.env.STRAVA_CLIENT_ID;
   const redirectUri = process.env.STRAVA_REDIRECT_URI;
+  const frontendRedirect = req.query.redirect_uri || 'http://localhost:5173';
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
     response_type: 'code',
-    scope: 'activity:read_all,profile:read_all'
+    scope: 'activity:read_all,profile:read_all',
+    state: encodeURIComponent(frontendRedirect)
   });
   const redirectUrl = `https://www.strava.com/oauth/authorize?${params}`;
   console.log('Redirecting to:', redirectUrl);
@@ -21,7 +23,7 @@ app.get('/authorize', (req, res) => {
 });
 
 app.get('/exchange_token', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
   try {
     const response = await axios.post('https://www.strava.com/oauth/token', null, {
       params: {
@@ -31,8 +33,9 @@ app.get('/exchange_token', async (req, res) => {
         grant_type: 'authorization_code'
       }
     });
-const { access_token, athlete } = response.data;
-res.redirect(`http://localhost:5173/?access_token=${access_token}&athlete_id=${athlete.id}`);
+    const { access_token, athlete } = response.data;
+    const frontendRedirect = state ? decodeURIComponent(state) : 'http://localhost:5173';
+    res.redirect(`${frontendRedirect}?access_token=${access_token}&athlete_id=${athlete.id}`);
   } catch (err) {
     res.status(500).json({ error: err.toString() });
   }
