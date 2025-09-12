@@ -13,18 +13,21 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/api/authorize', (req, res) => { // <--- CHANGE HERE
+app.get('/api/authorize', (req, res) => {
   console.log('Authorize endpoint called. Query:', req.query);
   const clientId = process.env.STRAVA_CLIENT_ID;
   const redirectUri = process.env.STRAVA_REDIRECT_URI;
-  const frontendRedirect = req.query.redirect_uri || 'http://localhost:5173';
+  
+  const frontendRedirect = req.query.redirect_uri || 'http://penten.duckdns.org'; 
+
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'activity:read_all,profile:read_all',
-    state: encodeURIComponent(frontendRedirect)
+    state: frontendRedirect 
   });
+  
   const redirectUrl = `https://www.strava.com/oauth/authorize?${params}`;
   console.log('Redirecting to:', redirectUrl);
   res.redirect(redirectUrl);

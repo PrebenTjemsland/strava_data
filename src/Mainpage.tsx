@@ -7,10 +7,15 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
         let backendBase = window.location.origin;
         if (backendBase.match(/:\d+$/)) {
             backendBase = backendBase.replace(/:\d+$/, ':5050');
+        } else {
+            const frontendUrl = window.location.origin;
+
+            const frontendUrlForState = 'http://penten.duckdns.org';
+
+            window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrlForState)}`;
         }
-        const frontendUrl = window.location.origin;
-        window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
     };
+
     const formatTime = (seconds: number | null | undefined) => {
         if (seconds === undefined || seconds === null) {
             return 'N/A';
