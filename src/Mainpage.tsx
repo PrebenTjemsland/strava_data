@@ -75,11 +75,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                 )}
             </div>
             <footer style={{ textAlign: 'center', marginTop: 32, marginBottom: 16 }}>
-                <img
-                    src="/api_logo_pwrdBy_strava_stack_orange.svg"
-                    alt="Powered by Strava"
-                    style={{ height: 32, width: 'auto', opacity: 0.85 }}
-                />
+                <img src="/api_logo_pwrdBy_strava_stack.svg" alt="Powered by Strava" style={{ height: 32, width: 'auto', opacity: 0.85 }} />
             </footer>
         </div>
     );
