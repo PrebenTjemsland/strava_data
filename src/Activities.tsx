@@ -12,7 +12,7 @@ function Activities({ accessToken }: { accessToken: string }) {
         if (!accessToken) return;
         setLoading(true);
         setError(null);
-        fetch(`http://${backendBase}/api/activities?access_token=${accessToken}`)
+        fetch(`${backendBase}/api/activities?access_token=${accessToken}`)
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch activities');
                 return res.json();

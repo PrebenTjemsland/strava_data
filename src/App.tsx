@@ -22,7 +22,7 @@ function App() {
             setAccessToken(token);
             setLoading(true);
             setError(null);
-            fetch(`http://${backendBase}/api/athlete_stats?access_token=${token}&athlete_id=${athleteId}`)
+            fetch(`${backendBase}/api/athlete_stats?access_token=${token}&athlete_id=${athleteId}`)
                 .then((res) => {
                     if (!res.ok) throw new Error('Failed to fetch stats');
                     return res.json();
