@@ -8,7 +8,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
         if (backendBase.match(/:\d+$/)) {
             backendBase = backendBase.replace(/:\d+$/, ':5050');
         } else {
-            const frontendUrl = window.location.origin;
+            //const frontendUrl = window.location.origin;
 
             const frontendUrlForState = 'http://penten.duckdns.org';
 
