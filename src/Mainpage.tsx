@@ -4,7 +4,12 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
     const navigate = useNavigate();
 
     const handleConnect = () => {
-        window.location.href = 'http://localhost:5050/authorize';
+        let backendBase = window.location.origin;
+        if (backendBase.match(/:\d+$/)) {
+            backendBase = backendBase.replace(/:\d+$/, ':5050');
+        }
+        const frontendUrl = window.location.origin;
+        window.location.href = `${backendBase}/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
     };
     const formatTime = (seconds: number | null | undefined) => {
         if (seconds === undefined || seconds === null) {
