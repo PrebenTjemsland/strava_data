@@ -10,7 +10,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
         } else {
             //const frontendUrl = window.location.origin;
 
-            const frontendUrlForState = 'http://penten.duckdns.org:5050';
+            const frontendUrlForState = 'http://penten.duckdns.org';
 
             window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrlForState)}`;
         }
