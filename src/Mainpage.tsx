@@ -9,7 +9,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
             backendBase = backendBase.replace(/:\d+$/, ':5050');
         }
         const frontendUrl = window.location.origin;
-        window.location.href = `${backendBase}/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
+        window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
     };
     const formatTime = (seconds: number | null | undefined) => {
         if (seconds === undefined || seconds === null) {

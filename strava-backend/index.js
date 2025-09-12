@@ -13,7 +13,7 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/authorize', (req, res) => {
+app.get('/api/authorize', (req, res) => { // <--- CHANGE HERE
   console.log('Authorize endpoint called. Query:', req.query);
   const clientId = process.env.STRAVA_CLIENT_ID;
   const redirectUri = process.env.STRAVA_REDIRECT_URI;
@@ -30,7 +30,7 @@ app.get('/authorize', (req, res) => {
   res.redirect(redirectUrl);
 });
 
-app.get('/exchange_token', async (req, res) => {
+app.get('/api/exchange_token', async (req, res) => {
   const { code, state } = req.query;
   console.log('Exchange token endpoint called. Query:', req.query);
   try {
@@ -52,7 +52,7 @@ app.get('/exchange_token', async (req, res) => {
   }
 });
 
-app.get('/activities', async (req, res) => {
+app.get('/api/activities', async (req, res) => {
   const { access_token } = req.query;
   console.log('/activities called. Query:', req.query);
   if (!access_token) {
@@ -70,7 +70,7 @@ app.get('/activities', async (req, res) => {
   }
 });
 
-app.get('/athlete_stats', async (req, res) => {
+app.get('/api/athlete_stats', async (req, res) => {
   const { access_token, athlete_id } = req.query;
   console.log('/athlete_stats called. Query:', req.query);
   if (!access_token || !athlete_id) {
