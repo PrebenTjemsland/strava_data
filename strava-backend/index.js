@@ -2,11 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+
 const app = express();
 app.use(cors());
 
+// Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 
 app.get('/authorize', (req, res) => {
+  console.log('Authorize endpoint called. Query:', req.query);
   const clientId = process.env.STRAVA_CLIENT_ID;
   const redirectUri = process.env.STRAVA_REDIRECT_URI;
   const frontendRedirect = req.query.redirect_uri || 'http://localhost:5173';
@@ -24,6 +32,7 @@ app.get('/authorize', (req, res) => {
 
 app.get('/exchange_token', async (req, res) => {
   const { code, state } = req.query;
+  console.log('Exchange token endpoint called. Query:', req.query);
   try {
     const response = await axios.post('https://www.strava.com/oauth/token', null, {
       params: {
@@ -35,15 +44,19 @@ app.get('/exchange_token', async (req, res) => {
     });
     const { access_token, athlete } = response.data;
     const frontendRedirect = state ? decodeURIComponent(state) : 'http://localhost:5173';
+    console.log('Token exchange success. Redirecting to:', `${frontendRedirect}?access_token=${access_token}&athlete_id=${athlete.id}`);
     res.redirect(`${frontendRedirect}?access_token=${access_token}&athlete_id=${athlete.id}`);
   } catch (err) {
-    res.status(500).json({ error: err.toString() });
+    console.error('Error in /exchange_token:', err);
+    res.status(500).json({ error: err.toString(), details: err?.response?.data || null });
   }
 });
 
 app.get('/activities', async (req, res) => {
   const { access_token } = req.query;
+  console.log('/activities called. Query:', req.query);
   if (!access_token) {
+    console.warn('Missing access_token in /activities');
     return res.status(400).json({ error: 'Missing access_token' });
   }
   try {
@@ -52,13 +65,16 @@ app.get('/activities', async (req, res) => {
     });
     res.json(response.data);
   } catch (err) {
-    res.status(500).json({ error: err.toString() });
+    console.error('Error in /activities:', err);
+    res.status(500).json({ error: err.toString(), details: err?.response?.data || null });
   }
 });
 
 app.get('/athlete_stats', async (req, res) => {
   const { access_token, athlete_id } = req.query;
+  console.log('/athlete_stats called. Query:', req.query);
   if (!access_token || !athlete_id) {
+    console.warn('Missing access_token or athlete_id in /athlete_stats');
     return res.status(400).json({ error: 'Missing access_token or athlete_id' });
   }
   try {
@@ -67,7 +83,8 @@ app.get('/athlete_stats', async (req, res) => {
     });
     res.json(response.data);
   } catch (err) {
-    res.status(500).json({ error: err.toString() });
+    console.error('Error in /athlete_stats:', err);
+    res.status(500).json({ error: err.toString(), details: err?.response?.data || null });
   }
 });
 
