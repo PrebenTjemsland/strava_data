@@ -51,7 +51,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                 <button onClick={() => navigate('/activities')} disabled={!accessToken}>
                     Go to Activities
                 </button>
-                {loading && <p>Loading...</p>}
+                {loading && <p>Loading....</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {stats && (
                     <div>
