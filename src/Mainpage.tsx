@@ -94,6 +94,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                             <p>Total Distance: {(stats.all_ride_totals.distance / 1000).toFixed(2)} km</p>
                             <p>Longest Ride: {(stats.biggest_ride_distance / 1000).toFixed(2)} km</p>
                             <p>Biggest Climb: {stats.biggest_climb_elevation_gain.toFixed(2)} m</p>
+                            <p>Elevation Gained: {stats.all_ride_totals.elevation_gain.toFixed(2)} m</p>
                             <div className="chart-container">
                                 <Bar data={rideData} />
                             </div>
