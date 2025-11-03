@@ -49,7 +49,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
 
     const funFacts = {
         everestClimbs: stats ? (stats.all_ride_totals.elevation_gain / 8848).toFixed(2) : 0,
-        aroundTheWorld: stats ? ((stats.all_run_totals?.distance + stats.all_ride_totals.distance) / 40075000).toFixed(4) : 0,
+        aroundTheWorld: stats ? (((stats.all_run_totals?.distance + stats.all_ride_totals.distance) / 40075000) * 100).toFixed(2) : 0,
     };
 
     return (
