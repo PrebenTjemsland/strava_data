@@ -18,7 +18,7 @@ app.get('/api/authorize', (req, res) => {
   const clientId = process.env.STRAVA_CLIENT_ID;
   const redirectUri = process.env.STRAVA_REDIRECT_URI;
   
-  const frontendRedirect = req.query.redirect_uri || 'http://penten.duckdns.org'; 
+  const frontendRedirect = req.query.redirect_uri || 'https://penten.duckdns.org'; 
 
   const params = new URLSearchParams({
     client_id: clientId,
