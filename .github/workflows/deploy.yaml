@@ -36,7 +36,7 @@ jobs:
                   port: ${{ secrets.SERVER_PORT }}
                   script: |
                       set -e # Exit immediately if a command exits with a non-zero status.
-                      cd /var/www/mywebapp/strava_data
+                      cd /var/www/mywebapp
                       git pull origin main
                       npm install --production
                       pm2 restart strava-data-backend-api
@@ -48,4 +48,4 @@ jobs:
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_PORT }}
                   source: 'dist/'
-                  target: '/var/www/mywebapp/strava_data/'
+                  target: '/var/www/mywebapp/'
