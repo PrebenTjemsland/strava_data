@@ -1,4 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function MainPage({ accessToken, stats, loading, error }: { accessToken: string; stats: any; loading: boolean; error: string | null }) {
     const navigate = useNavigate();
@@ -7,13 +11,9 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
         let backendBase = window.location.origin;
         if (backendBase.match(/:\d+$/)) {
             backendBase = backendBase.replace(/:\d+$/, ':5050');
-        } else {
-            //const frontendUrl = window.location.origin;
-
-            const frontendUrlForState = 'https://penten.duckdns.org';
-
-            window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrlForState)}`;
         }
+        const frontendUrl = window.location.origin;
+        window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
     };
 
     const formatTime = (seconds: number | null | undefined) => {
@@ -22,15 +22,39 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
         }
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        const remainingSeconds = seconds % 60;
-
-        const pad = (num: number) => num.toString().padStart(2, '0');
-
-        return `${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+        return `${hours}h ${minutes}m`;
     };
+
+    const runData = {
+        labels: ['Your Runs'],
+        datasets: [
+            {
+                label: 'Total Distance (km)',
+                data: [stats ? (stats.all_run_totals?.distance / 1000).toFixed(2) : 0],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            },
+        ],
+    };
+
+    const rideData = {
+        labels: ['Your Rides'],
+        datasets: [
+            {
+                label: 'Total Distance (km)',
+                data: [stats ? (stats.all_ride_totals.distance / 1000).toFixed(2) : 0],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            },
+        ],
+    };
+
+    const funFacts = {
+        everestClimbs: stats ? (stats.all_ride_totals.elevation_gain / 8848).toFixed(2) : 0,
+        aroundTheWorld: stats ? ((stats.all_run_totals?.distance + stats.all_ride_totals.distance) / 40075000).toFixed(4) : 0,
+    };
+
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1 }}>
+        <div className="main-container">
+            <header className="header">
                 <h1>Strava Activities Viewer</h1>
                 {!accessToken && (
                     <a
@@ -39,45 +63,56 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                             e.preventDefault();
                             handleConnect();
                         }}
-                        style={{ display: 'inline-block' }}
                     >
-                        <img
-                            src="/btn_strava_connect_with_orange.svg"
-                            alt="Connect with Strava"
-                            style={{ height: 48, width: 'auto', verticalAlign: 'middle', cursor: 'pointer' }}
-                        />
+                        <img src="/btn_strava_connect_with_orange.svg" alt="Connect with Strava" className="strava-connect-btn" />
                     </a>
                 )}
                 <button onClick={() => navigate('/activities')} disabled={!accessToken}>
                     Go to Activities
                 </button>
-                {loading && <p>Loading....</p>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {stats && (
-                    <div>
-                        <h2>Total Stats</h2>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div>
-                                <div style={{ fontSize: 32 }}>🏃</div>
-                                <p>Total Runs: {stats.all_run_totals?.count}</p>
-                                <p>Total Run Distance: {(stats.all_run_totals?.distance / 1000).toFixed(2)} km</p>
-                                <p>Total running time: {formatTime(stats.all_run_totals?.moving_time)}</p>
-                            </div>
-                            <div>
-                                <div style={{ fontSize: 32 }}>🚴</div>
-                                <p>Total Rides: {stats.all_ride_totals?.count}</p>
-                                <p>All Ride Distance: {(stats.all_ride_totals.distance / 1000).toFixed(2)} km</p>
-                                <p>Longest Ride: {(stats.biggest_ride_distance / 1000).toFixed(2)} km</p>
-                                <p>Biggest Climb: {stats.biggest_climb_elevation_gain.toFixed(2)} meter</p>
+            </header>
+
+            {loading && <p>Loading....</p>}
+            {error && <p className="error-message">{error}</p>}
+
+            {stats && (
+                <main className="stats-container">
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <h2>🏃 Total Run Stats</h2>
+                            <p>Total Runs: {stats.all_run_totals?.count}</p>
+                            <p>Total Distance: {(stats.all_run_totals?.distance / 1000).toFixed(2)} km</p>
+                            <p>Total Time: {formatTime(stats.all_run_totals?.moving_time)}</p>
+                            <div className="chart-container">
+                                <Bar data={runData} />
                             </div>
                         </div>
+
+                        <div className="stat-card">
+                            <h2>🚴 Total Ride Stats</h2>
+                            <p>Total Rides: {stats.all_ride_totals?.count}</p>
+                            <p>Total Distance: {(stats.all_ride_totals.distance / 1000).toFixed(2)} km</p>
+                            <p>Longest Ride: {(stats.biggest_ride_distance / 1000).toFixed(2)} km</p>
+                            <p>Biggest Climb: {stats.biggest_climb_elevation_gain.toFixed(2)} m</p>
+                            <div className="chart-container">
+                                <Bar data={rideData} />
+                            </div>
+                        </div>
+
+                        <div className="stat-card">
+                            <h2>🌍 Fun Facts</h2>
+                            <p>You've climbed Mount Everest {funFacts.everestClimbs} times!</p>
+                            <p>You've traveled {funFacts.aroundTheWorld}% of the way around the world!</p>
+                        </div>
                     </div>
-                )}
-            </div>
-            <footer style={{ textAlign: 'center', marginTop: 32, marginBottom: 16 }}>
-                <img src="/logo_pwrdBy_strava_stack.svg" alt="Powered by Strava" style={{ height: 32, width: 'auto', opacity: 0.85 }} />
+                </main>
+            )}
+
+            <footer className="footer">
+                <img src="/logo_pwrdBy_strava_stack.svg" alt="Powered by Strava" />
             </footer>
         </div>
     );
 }
+
 export default MainPage;
