@@ -1,15 +1,25 @@
 # Strava Stats Dashboard
 
-This project is a modern web application built with React, TypeScript, Vite, and Node.js. It displays your Strava activities and general stats in a user-friendly dashboard. OAuth2 authentication is used to securely fetch your data from Strava.
+<img width="886" height="1291" alt="Screenshot 2025-11-03 at 15 08 38" src="https://github.com/user-attachments/assets/a8189a59-8ba3-4d8c-84c4-d3f370c1566c" />
 
+This project is a modern web application built with React, TypeScript, Vite, and Node.js. It provides a user-friendly dashboard to view your Strava activities and personal statistics. The app uses the OAuth2 protocol to securely fetch your data from the Strava API.
 ## Features
+Secure Authentication: Connect your Strava account using the official OAuth2 flow.
+Aggregate Stats: View your all-time totals for running and cycling (distance, time, count).
+Fun Visualizations: See your stats displayed in charts and compared to fun real-world metrics (like climbing Mt. Everest!).
+Activity Feed: Browse your recent activities on a dedicated page.
+Modern Tech Stack: Built with a responsive and fast UI (Vite + React) and a lightweight Node.js backend.
 
--   Login with Strava (OAuth2)
--   View your total running and cycling stats (distance, time, count, etc.)
--   Browse your recent activities on a dedicated page
--   Responsive and fast UI (Vite + React)
+## Strava API Usage Notice
+Please note that Strava's API policy limits unapproved applications to 100 API requests every 15 minutes and 1,000 requests daily. This is sufficient for personal use.
+If you intend to make this application public or share it with others, you must submit your application to Strava for approval to get a higher rate limit.
 
 ## Getting Started
+
+### Prerequisites
+* Node.js (v16 or later recommended)
+* npm
+* A Strava account
 
 ### 1. Register a Strava API Application
 
