@@ -69,11 +69,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                     </a>
                 ) : (
                     <>
-                        <button
-                            onClick={() => navigate('/activities')}
-                            className="modern-button"
-                            style={{ marginRight: 8 }}
-                        >
+                        <button onClick={() => navigate('/activities')} className="modern-button" style={{ marginRight: 8 }}>
                             Go to Activities
                         </button>
                         <button onClick={() => navigate('/athlete')} className="modern-button">
