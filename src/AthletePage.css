@@ -1,27 +1,32 @@
 .athlete-page {
+    width: 100%;
     max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1rem;
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .athlete-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
     margin-bottom: 20px;
     border: 1px solid #ccc;
-    padding: 10px;
-    gap: 16px;
+    padding: 1rem;
+    gap: 12px;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .athlete-header img,
 .profile-image {
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    margin-right: 0;
+    width: 80px;
+    height: 80px;
     border: 2px solid #0073e6;
 }
 
@@ -33,16 +38,29 @@
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin: 20px 0;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+    padding: 0 4px;
+    box-sizing: border-box;
 }
 
 .stat-item {
     background-color: #e9ecef;
-    padding: 14px;
+    padding: 12px 8px;
     border-radius: 8px;
     text-align: center;
+}
+
+.stat-item h3 {
+    font-size: 0.9rem;
+    margin: 0 0 8px 0;
+}
+
+.stat-item p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
 .athlete-gear {
@@ -109,20 +127,60 @@
 }
 
 @media (max-width: 700px) {
+    .athlete-page {
+        padding: 0.5rem;
+        border: none;
+    }
+
+    .athlete-header {
+        margin: 0 -0.5rem 1rem;
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+    }
+
+    .athlete-header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .athlete-header p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
     .gear-item {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        padding: 1rem;
     }
+
     .gear-header {
         justify-content: center;
     }
+
+    .gear-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
     .gear-details {
         align-items: center;
     }
+
+    .gear-details p {
+        margin: 8px 0;
+    }
+
     .image-preview {
         width: 100px;
         height: 100px;
+    }
+
+    .gear-list {
+        margin: 8px -0.5rem;
+        gap: 8px;
     }
 }
 
