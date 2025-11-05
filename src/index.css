@@ -1,3 +1,10 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -54,8 +61,11 @@ body {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  /* Let the grid create columns that are at least 380px wide, but can grow.
+     This is the key to a responsive layout that doesn't overlap. */
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 2rem;
+  width: 100%; /* Ensure the grid container takes up the full width available */
 }
 
 .stat-card {
@@ -64,6 +74,10 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  /* By removing min-width, the card will now correctly obey the size
+     of the grid column it's placed in. */
+  display: flex; /* Helps align content inside, especially useful if cards have different content heights */
+  flex-direction: column;
 }
 
 .stat-card:hover {

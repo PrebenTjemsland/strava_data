@@ -1,0 +1,103 @@
+.stats-grid {
+    display: grid;
+    /* This creates responsive columns. They will be at least 380px wide,
+       and the grid will fit as many as possible before wrapping to the next line. */
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 2rem; /* This is the correct way to add space between grid items */
+}
+
+/* Stat Card Styling & Structure */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    /* Use flexbox to manage the internal layout of the card and ensure consistent height */
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    color: #333;
+    flex-shrink: 0; /* Prevents the title from shrinking */
+}
+
+/* Stat Summary Layout (Content inside the card) */
+.stat-summary {
+    flex-shrink: 0; /* The summary content should not shrink */
+    margin-bottom: 1.5rem;
+}
+
+.stat-primary {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-primary .stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.stat-secondary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #718096;
+    margin: 0 0 0.25rem 0;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Chart Container */
+.chart-wrapper {
+    /* This allows the chart wrapper to grow and fill the remaining vertical space */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 250px; /* Give the chart a minimum height */
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    margin-top: auto; /* Pushes the chart to the bottom if there's extra space */
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 820px) {
+    .stats-grid {
+       /* Adjust the minimum card width on smaller screens to allow for better wrapping */
+       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        gap: 1rem;
+    }
+    .stat-card {
+        padding: 1rem;
+    }
+}
