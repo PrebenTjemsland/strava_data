@@ -56,17 +56,6 @@ function App() {
         }
     }, [accessToken]);
 
-    const handleReconnect = () => {
-        localStorage.removeItem('accessToken');
-        setAccessToken('');
-        let backendBase = window.location.origin;
-        if (backendBase.match(/:\d+$/)) {
-            backendBase = backendBase.replace(/:\d+$/, ':5050');
-        }
-        const frontendUrl = window.location.origin;
-        window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
-    };
-
     return (
         <Router>
             <Routes>
@@ -74,11 +63,6 @@ function App() {
                 <Route path="/activities" element={<Activities accessToken={accessToken} />} />
                 <Route path="/athlete" element={<AthletePage accessToken={accessToken} stats={stats} />} />
             </Routes>
-            {!accessToken && (
-                <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
-                    <button onClick={handleReconnect}>Reconnect to Strava</button>
-                </div>
-            )}
         </Router>
     );
 }

@@ -57,7 +57,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
         <div className="main-container">
             <header className="header">
                 <h1>Strava Activities Viewer</h1>
-                {!accessToken && (
+                {!accessToken ? (
                     <a
                         href="#"
                         onClick={(e) => {
@@ -67,18 +67,20 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                     >
                         <img src="/btn_strava_connect_with_orange.svg" alt="Connect with Strava" className="strava-connect-btn" />
                     </a>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => navigate('/activities')}
+                            className="modern-button"
+                            style={{ marginRight: 8 }}
+                        >
+                            Go to Activities
+                        </button>
+                        <button onClick={() => navigate('/athlete')} className="modern-button">
+                            Go to Athlete
+                        </button>
+                    </>
                 )}
-                <button
-                    onClick={() => navigate('/activities')}
-                    disabled={!accessToken}
-                    className="modern-button"
-                    style={{ marginRight: 8 }}
-                >
-                    Go to Activities
-                </button>
-                <button onClick={() => navigate('/athlete')} disabled={!accessToken} className="modern-button">
-                    Go to Athlete
-                </button>
             </header>
 
             {loading && <p>Loading....</p>}
