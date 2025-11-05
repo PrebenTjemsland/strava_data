@@ -1,0 +1,130 @@
+.activities-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.activities-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.activities-header h2 {
+    margin: 0;
+    margin-left: 16px;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+}
+
+.activity-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.activity-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.activity-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 12px 0;
+}
+
+.activity-type-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.activity-type-Run {
+    background-color: #ffece9;
+    color: #fc4c02;
+}
+
+.activity-type-Ride {
+    background-color: #e8f4ff;
+    color: #027ce9;
+}
+
+.activity-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #333;
+}
+
+.activity-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 8px 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.achievements {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.achievement-badge {
+    background: #fff4e5;
+    color: #f5a623;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.error {
+    background: #fee;
+    color: #e33;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+}

@@ -43,16 +43,3 @@
     background-color: #eef0f4;
     color: #333;
 }
-
-/* Back button specific style */
-.modern-button.back {
-    background-color: transparent;
-    color: #666;
-    border: 1px solid #ddd;
-    padding: 6px 12px;
-}
-
-.modern-button.back:hover {
-    background-color: #f7f7fa;
-    color: #333;
-}
