@@ -1,0 +1,133 @@
+.athlete-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
+.athlete-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    gap: 16px;
+}
+
+.athlete-header img,
+.profile-image {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-right: 0;
+    border: 2px solid #0073e6;
+}
+
+.athlete-header .athlete-name,
+.athlete-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.stat-item {
+    background-color: #e9ecef;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.athlete-gear {
+    margin-top: 20px;
+}
+
+.gear-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 12px 0 24px;
+}
+
+.gear-item {
+    background-color: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: left;
+}
+
+.gear-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.gear-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+.gear-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.gear-image-upload {
+    flex: 0 0 auto;
+}
+
+.image-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* compact image button inside upload component */
+.image-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
+@media (max-width: 700px) {
+    .gear-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .gear-header {
+        justify-content: center;
+    }
+    .gear-details {
+        align-items: center;
+    }
+    .image-preview {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* transient storage error message */
+.storage-error {
+    color: tomato;
+    margin-top: 8px;
+}

@@ -91,4 +91,43 @@ app.get('/api/athlete_stats', async (req, res) => {
   }
 });
 
+app.get('/api/athlete', async (req, res) => {
+  console.log('here');
+  
+  const { access_token } = req.query;
+  console.log('/athlete called. Query:', req.query);
+  if (!access_token) {
+    console.warn('Missing access_token in /athlete');
+    return res.status(400).json({ error: 'Missing access_token' });
+  }
+  try {
+    const response = await axios.get('https://www.strava.com/api/v3/athlete', {
+      headers: { Authorization: `Bearer ${access_token}` }
+    });
+    res.json(response.data);
+  } catch (err) {
+    console.error('Error in /athlete:', err);
+    res.status(500).json({ error: err.toString(), details: err?.response?.data || null });
+  }
+});
+
+app.get('/api/gear/:gearId', async (req, res) => {
+  const { access_token } = req.query;
+  const { gearId } = req.params;
+  console.log(`/gear/${gearId} called. Query:`, req.query);
+  if (!access_token) {
+    console.warn('Missing access_token in /gear/:gearId');
+    return res.status(400).json({ error: 'Missing access_token' });
+  }
+  try {
+    const response = await axios.get(`https://www.strava.com/api/v3/gear/${gearId}`, {
+      headers: { Authorization: `Bearer ${access_token}` }
+    });
+    res.json(response.data);
+  } catch (err) {
+    console.error(`Error in /gear/${gearId}:`, err);
+    res.status(500).json({ error: err.toString(), details: err?.response?.data || null });
+  }
+});
+
 app.listen(5050, () => console.log('Backend running on http://localhost:5050'));
