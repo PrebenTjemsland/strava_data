@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Activities({ accessToken }: { accessToken: string }) {
     const [activities, setActivities] = useState<any[]>([]);
@@ -8,6 +9,8 @@ function Activities({ accessToken }: { accessToken: string }) {
     if (backendBase.match(/:\d+$/)) {
         backendBase = backendBase.replace(/:\d+$/, ':5050');
     }
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (!accessToken) return;
         setLoading(true);
@@ -24,6 +27,9 @@ function Activities({ accessToken }: { accessToken: string }) {
 
     return (
         <div>
+            <button onClick={() => navigate('/')} className="modern-button" style={{ marginBottom: 10, marginTop: 10 }}>
+                ← Back
+            </button>
             <h2>Recent Activities</h2>
             {loading && <p>Loading...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
+import './styles/Button.css';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -67,8 +68,16 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                         <img src="/btn_strava_connect_with_orange.svg" alt="Connect with Strava" className="strava-connect-btn" />
                     </a>
                 )}
-                <button onClick={() => navigate('/activities')} disabled={!accessToken}>
+                <button
+                    onClick={() => navigate('/activities')}
+                    disabled={!accessToken}
+                    className="modern-button"
+                    style={{ marginRight: 8 }}
+                >
                     Go to Activities
+                </button>
+                <button onClick={() => navigate('/athlete')} disabled={!accessToken} className="modern-button">
+                    Go to Athlete
                 </button>
             </header>
 
@@ -83,6 +92,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                             <p>Total Runs: {stats.all_run_totals?.count}</p>
                             <p>Total Distance: {(stats.all_run_totals?.distance / 1000).toFixed(2)} km</p>
                             <p>Total Time: {formatTime(stats.all_run_totals?.moving_time)}</p>
+                            <p>Elevation Gained: {stats.all_run_totals.elevation_gain.toFixed(0)} m</p>
                             <div className="chart-container">
                                 <Bar data={runData} />
                             </div>
@@ -93,8 +103,8 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string;
                             <p>Total Rides: {stats.all_ride_totals?.count}</p>
                             <p>Total Distance: {(stats.all_ride_totals.distance / 1000).toFixed(2)} km</p>
                             <p>Longest Ride: {(stats.biggest_ride_distance / 1000).toFixed(2)} km</p>
-                            <p>Biggest Climb: {stats.biggest_climb_elevation_gain.toFixed(2)} m</p>
-                            <p>Elevation Gained: {stats.all_ride_totals.elevation_gain.toFixed(2)} m</p>
+                            <p>Biggest Climb: {stats.biggest_climb_elevation_gain.toFixed(0)} m</p>
+                            <p>Elevation Gained: {stats.all_ride_totals.elevation_gain.toFixed(0)} m</p>
                             <div className="chart-container">
                                 <Bar data={rideData} />
                             </div>

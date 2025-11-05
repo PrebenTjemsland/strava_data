@@ -1,0 +1,58 @@
+.modern-button {
+    background-color: #fc4c02;  /* Strava's orange color */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.modern-button:hover {
+    background-color: #e34402;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modern-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.modern-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Secondary button style */
+.modern-button.secondary {
+    background-color: #f7f7fa;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.modern-button.secondary:hover {
+    background-color: #eef0f4;
+    color: #333;
+}
+
+/* Back button specific style */
+.modern-button.back {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+}
+
+.modern-button.back:hover {
+    background-color: #f7f7fa;
+    color: #333;
+}
