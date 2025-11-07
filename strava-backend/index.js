@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -44,16 +45,61 @@ app.get('/api/exchange_token', async (req, res) => {
         code,
         grant_type: 'authorization_code'
       }
-    });
-    const { access_token, athlete } = response.data;
+    });            
+
+    const { access_token, refresh_token, expires_at, athlete } = response.data;
+          if (!refresh_token) {
+            console.error('CRITICAL: refresh_token was not received from Strava.');
+            return res.status(500).json({ error: "Did not receive refresh_token from Strava during initial auth." });
+        }
     const frontendRedirect = state ? decodeURIComponent(state) : 'http://localhost:5173';
-    console.log('Token exchange success. Redirecting to:', `${frontendRedirect}?access_token=${access_token}&athlete_id=${athlete.id}`);
-    res.redirect(`${frontendRedirect}?access_token=${access_token}&athlete_id=${athlete.id}`);
+        const redirectParams = new URLSearchParams({
+        access_token,
+        refresh_token,
+        expires_at: expires_at.toString(),
+        athlete_id: athlete.id,
+    });
+    const redirectUrl = `${frontendRedirect}?${redirectParams}`;
+    res.redirect(redirectUrl);
   } catch (err) {
     console.error('Error in /exchange_token:', err);
     res.status(500).json({ error: err.toString(), details: err?.response?.data || null });
   }
 });
+
+app.post('/api/refresh_token', async (req, res) => {
+    const { refresh_token } = req.body;
+    console.log('Refresh token endpoint called.');
+
+    if (!refresh_token) {
+        return res.status(400).json({ error: 'Missing refresh_token' });
+    }
+
+    try {
+        const response = await axios.post('https://www.strava.com/oauth/token', null, {
+            params: {
+                client_id: process.env.STRAVA_CLIENT_ID,
+                client_secret: process.env.STRAVA_CLIENT_SECRET,
+                grant_type: 'refresh_token',
+                refresh_token,
+            },
+        });
+
+        // Send back the new tokens
+        res.json({
+            access_token: response.data.access_token,
+            refresh_token: response.data.refresh_token,
+            expires_at: response.data.expires_at,
+        });
+
+    } catch (err) {
+        console.error('Error refreshing token:', err.response ? err.response.data : err.message);
+        // If refresh fails, it's likely the user revoked access.
+        // The client should handle this by clearing its stored tokens.
+        res.status(401).json({ error: 'Failed to refresh token', details: err?.response?.data || null });
+    }
+});
+
 
 app.get('/api/activities', async (req, res) => {
   const { access_token } = req.query;
