@@ -42,6 +42,7 @@ jobs:
                       pm2 describe strava-data-backend-api >/dev/null 2>&1 && \
                         pm2 restart strava-data-backend-api || \
                         pm2 start strava-backend/index.js --name strava-data-backend-api --update-env
+                      pm2 save
             - name: Deploy Frontend via SCP
               uses: appleboy/scp-action@v1.0.0
               with:
