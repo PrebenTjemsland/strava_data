@@ -58,7 +58,7 @@ jobs:
                   username: ${{ secrets.SERVER_USER }}
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_PORT }}
-                  source: 'dist/*'
-                  target: '/var/www/mywebapp/dist/'
-                  rm: true
-                  overwrite: true
+                  # Copy the dist folder into /var/www/mywebapp so the host mount
+                  # /var/www/mywebapp/dist -> /data/frontend stays populated.
+                  source: 'dist/'
+                  target: '/var/www/mywebapp/'
