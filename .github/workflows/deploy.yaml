@@ -55,10 +55,20 @@ jobs:
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_PORT }}
                   script: |
-                      set -e
-                      RELEASE_DIR='${{ env.RELEASE_DIR }}'
-                      BACKEND_DIR=/tmp/strava_backend_current
+                      set -euo pipefail
+                      RELEASE_ROOT='${{ env.RELEASE_DIR }}'
+                      BACKEND_DIR='/tmp/strava_backend_${{ github.run_id }}_${{ github.run_attempt }}'
 
+                      RELEASE_DIR="$RELEASE_ROOT"
+                      if [ ! -f "$RELEASE_DIR/dist/index.html" ] || [ ! -f "$RELEASE_DIR/strava-backend/index.js" ]; then
+                        MATCH="$(find "$RELEASE_ROOT" -maxdepth 5 -type f -path '*/dist/index.html' | head -n 1 || true)"
+                        if [ -z "$MATCH" ]; then
+                          echo "Could not locate dist/index.html under $RELEASE_ROOT"
+                          find "$RELEASE_ROOT" -maxdepth 5 -print || true
+                          exit 1
+                        fi
+                        RELEASE_DIR="$(dirname "$(dirname "$MATCH")")"
+                      fi
                       test -f "$RELEASE_DIR/dist/index.html"
                       test -f "$RELEASE_DIR/strava-backend/index.js"
                       test -f "$RELEASE_DIR/strava-backend/package-lock.json"
@@ -68,7 +78,7 @@ jobs:
                       docker cp "$RELEASE_DIR/dist/." nginx-proxy-manager:/data/frontend/
 
                       # Stage backend into a stable host path before container start.
-                      rm -rf "$BACKEND_DIR"
+                      rm -rf "$BACKEND_DIR" || true
                       mkdir -p "$BACKEND_DIR"
                       cp -a "$RELEASE_DIR/strava-backend/." "$BACKEND_DIR/"
 
