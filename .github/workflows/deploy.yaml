@@ -47,7 +47,6 @@ jobs:
                       cd /var/www/mywebapp
                       git pull origin main
                       npm install --production
-                      mkdir -p /var/www/mywebapp/strava-data
                       pm2 describe strava-data-backend-api >/dev/null 2>&1 && \
                         pm2 restart strava-data-backend-api || \
                         pm2 start strava-backend/index.js --name strava-data-backend-api --update-env
@@ -60,6 +59,6 @@ jobs:
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_PORT }}
                   source: 'dist/*'
-                  target: '/var/www/mywebapp/strava-data/'
+                  target: '/var/www/mywebapp/dist/'
                   rm: true
                   overwrite: true
