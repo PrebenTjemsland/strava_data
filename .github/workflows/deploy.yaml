@@ -35,7 +35,17 @@ jobs:
                   VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://penten.duckdns.org' }}
               run: npm run build
 
-            - name: Deploy to Server
+            - name: Upload Release Bundle
+              uses: appleboy/scp-action@v1.0.0
+              with:
+                  host: ${{ secrets.SERVER_HOST }}
+                  username: ${{ secrets.SERVER_USER }}
+                  key: ${{ secrets.SERVER_SSH_KEY }}
+                  port: ${{ secrets.SERVER_PORT }}
+                  source: 'dist/,strava-backend/'
+                  target: '/tmp/strava_data_release/'
+
+            - name: Deploy on Server
               uses: appleboy/ssh-action@v1.0.0
               with:
                   host: ${{ secrets.SERVER_HOST }}
@@ -43,31 +53,27 @@ jobs:
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_PORT }}
                   script: |
-                      set -e # Exit immediately if a command exits with a non-zero status.
-                      cd /var/www/mywebapp
-                      # Frontend deploy step writes into dist/, so keep pulls resilient to local changes.
-                      git pull --rebase --autostash origin main
+                      set -e
+                      RELEASE_DIR=/tmp/strava_data_release
 
-                      # Run backend on the same Docker network as NPM to avoid host-port routing issues.
+                      test -f "$RELEASE_DIR/dist/index.html"
+                      test -f "$RELEASE_DIR/strava-backend/index.js"
+
+                      # Frontend publish directly into NPM container web root.
+                      docker exec nginx-proxy-manager sh -lc 'rm -rf /data/frontend/*'
+                      docker cp "$RELEASE_DIR/dist/." nginx-proxy-manager:/data/frontend/
+
+                      # Backend runs on same Docker network as NPM.
                       docker pull node:20-alpine
                       docker rm -f strava-backend-api >/dev/null 2>&1 || true
                       docker run -d \
                         --name strava-backend-api \
                         --restart unless-stopped \
                         --network homelab-net \
-                        -v /var/www/mywebapp/strava-backend:/app \
+                        -v "$RELEASE_DIR/strava-backend:/app" \
+                        -v /var/www/mywebapp/strava-backend/.env:/app/.env:ro \
                         -w /app \
                         node:20-alpine \
-                        sh -lc 'set -a; . /app/.env; set +a; node index.js'
+                        sh -lc 'npm ci --omit=dev && set -a; . /app/.env; set +a; node index.js'
+
                       docker ps --filter name=strava-backend-api --format 'table {{.Names}}\t{{.Status}}\t{{.Networks}}'
-            - name: Deploy Frontend via SCP
-              uses: appleboy/scp-action@v1.0.0
-              with:
-                  host: ${{ secrets.SERVER_HOST }}
-                  username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.SERVER_SSH_KEY }}
-                  port: ${{ secrets.SERVER_PORT }}
-                  # Copy the dist folder into /var/www/mywebapp so the host mount
-                  # /var/www/mywebapp/dist -> /data/frontend stays populated.
-                  source: 'dist/'
-                  target: '/var/www/mywebapp/'
