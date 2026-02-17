@@ -45,12 +45,21 @@ jobs:
                   script: |
                       set -e # Exit immediately if a command exits with a non-zero status.
                       cd /var/www/mywebapp
-                      git pull origin main
-                      npm install --production
-                      pm2 describe strava-data-backend-api >/dev/null 2>&1 && \
-                        pm2 restart strava-data-backend-api || \
-                        pm2 start strava-backend/index.js --name strava-data-backend-api --update-env
-                      pm2 save
+                      # Frontend deploy step writes into dist/, so keep pulls resilient to local changes.
+                      git pull --rebase --autostash origin main
+
+                      # Run backend on the same Docker network as NPM to avoid host-port routing issues.
+                      docker pull node:20-alpine
+                      docker rm -f strava-backend-api >/dev/null 2>&1 || true
+                      docker run -d \
+                        --name strava-backend-api \
+                        --restart unless-stopped \
+                        --network homelab-net \
+                        -v /var/www/mywebapp/strava-backend:/app \
+                        -w /app \
+                        node:20-alpine \
+                        sh -lc 'set -a; . /app/.env; set +a; node index.js'
+                      docker ps --filter name=strava-backend-api --format 'table {{.Names}}\t{{.Status}}\t{{.Networks}}'
             - name: Deploy Frontend via SCP
               uses: appleboy/scp-action@v1.0.0
               with:
