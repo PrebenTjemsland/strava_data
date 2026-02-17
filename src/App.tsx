@@ -14,6 +14,10 @@ type TokenData = {
 };
 
 function App() {
+    const routerBasename = import.meta.env.BASE_URL.endsWith('/') && import.meta.env.BASE_URL !== '/'
+        ? import.meta.env.BASE_URL.slice(0, -1)
+        : import.meta.env.BASE_URL;
+
     const [tokenData, setTokenData] = useState<TokenData>(() => {
         const accessToken = localStorage.getItem('accessToken');
         const refreshToken = localStorage.getItem('refreshToken');
@@ -156,7 +160,7 @@ function App() {
     }, [tokenData.accessToken, athleteId, fetchWithRefresh]);
 
     return (
-        <Router>
+        <Router basename={routerBasename}>
             <Suspense fallback={<p>Loading...</p>}>
                 <Routes>
                     <Route path="/" element={<MainPage accessToken={tokenData.accessToken} stats={stats} loading={loading} error={error} />} />

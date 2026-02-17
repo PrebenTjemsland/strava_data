@@ -28,10 +28,10 @@ jobs:
               env:
                   # Configure deployment path and API host from GitHub Variables.
                   # Example:
-                  # - VITE_BASE_PATH=/qbit-st/
+                  # - VITE_BASE_PATH=/strava-data/
                   # - VITE_API_BASE_URL=https://penten.duckdns.org
-                  # Default is root path. Set VITE_BASE_PATH only when serving from a subpath.
-                  VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
+                  # Default deploy path for this app.
+                  VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/strava-data/' }}
                   VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://penten.duckdns.org' }}
               run: npm run build
 
