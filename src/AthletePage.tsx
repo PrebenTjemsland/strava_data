@@ -42,7 +42,7 @@ const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ acc
 
     React.useEffect(() => {
         if (!accessToken) return;
-        
+
         let backendBase = window.location.origin;
         if (backendBase.match(/:\d+$/)) {
             backendBase = backendBase.replace(/:\d+$/, ':5050');
