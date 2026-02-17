@@ -11,6 +11,8 @@ permissions:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        env:
+            RELEASE_DIR: /tmp/strava_data_release_${{ github.run_id }}_${{ github.run_attempt }}
 
         steps:
             - name: Checkout code
@@ -43,7 +45,7 @@ jobs:
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_PORT }}
                   source: 'dist/,strava-backend/'
-                  target: '/tmp/strava_data_release/'
+                  target: '${{ env.RELEASE_DIR }}/'
 
             - name: Deploy on Server
               uses: appleboy/ssh-action@v1.0.0
@@ -54,14 +56,21 @@ jobs:
                   port: ${{ secrets.SERVER_PORT }}
                   script: |
                       set -e
-                      RELEASE_DIR=/tmp/strava_data_release
+                      RELEASE_DIR='${{ env.RELEASE_DIR }}'
+                      BACKEND_DIR=/tmp/strava_backend_current
 
                       test -f "$RELEASE_DIR/dist/index.html"
                       test -f "$RELEASE_DIR/strava-backend/index.js"
+                      test -f "$RELEASE_DIR/strava-backend/package-lock.json"
 
                       # Frontend publish directly into NPM container web root.
                       docker exec nginx-proxy-manager sh -lc 'rm -rf /data/frontend/*'
                       docker cp "$RELEASE_DIR/dist/." nginx-proxy-manager:/data/frontend/
+
+                      # Stage backend into a stable host path before container start.
+                      rm -rf "$BACKEND_DIR"
+                      mkdir -p "$BACKEND_DIR"
+                      cp -a "$RELEASE_DIR/strava-backend/." "$BACKEND_DIR/"
 
                       # Backend runs on same Docker network as NPM.
                       docker pull node:20-alpine
@@ -70,10 +79,13 @@ jobs:
                         --name strava-backend-api \
                         --restart unless-stopped \
                         --network homelab-net \
-                        -v "$RELEASE_DIR/strava-backend:/app" \
+                        --user $(id -u):$(id -g) \
+                        -e HOME=/tmp \
+                        -v "$BACKEND_DIR:/app" \
                         -v /var/www/mywebapp/strava-backend/.env:/app/.env:ro \
                         -w /app \
                         node:20-alpine \
                         sh -lc 'npm ci --omit=dev && set -a; . /app/.env; set +a; node index.js'
 
                       docker ps --filter name=strava-backend-api --format 'table {{.Names}}\t{{.Status}}\t{{.Networks}}'
+                      rm -rf "$RELEASE_DIR" || true
