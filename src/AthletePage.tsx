@@ -28,7 +28,7 @@ interface Athlete {
     }>;
 }
 
-const AthletePage: React.FC<{ accessToken: string; stats: any }> = ({ accessToken, stats }) => {
+const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ accessToken, stats }) => {
     const [athlete, setAthlete] = React.useState<Athlete | null>(null);
     const [loading, setLoading] = React.useState(true);
 
@@ -41,6 +41,8 @@ const AthletePage: React.FC<{ accessToken: string; stats: any }> = ({ accessToke
     const navigate = useNavigate();
 
     React.useEffect(() => {
+        if (!accessToken) return;
+        
         let backendBase = window.location.origin;
         if (backendBase.match(/:\d+$/)) {
             backendBase = backendBase.replace(/:\d+$/, ':5050');

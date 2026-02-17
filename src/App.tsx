@@ -153,10 +153,6 @@ function App() {
         }
     }, [tokenData.accessToken, athleteId, fetchWithRefresh]);
 
-    if (!tokenData.accessToken || !athleteId) {
-        return <div>Redirecting to Strava login...</div>;
-    }
-
     return (
         <Router>
             <Routes>

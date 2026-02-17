@@ -33,7 +33,7 @@ interface Activity {
     end_latlng?: [number, number];
 }
 
-function Activities({ accessToken }: { accessToken: string }) {
+function Activities({ accessToken }: { accessToken: string | null }) {
     const [activities, setActivities] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
