@@ -6,7 +6,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function MainPage({ accessToken, stats, loading, error }: { accessToken: string; stats: any; loading: boolean; error: string | null }) {
+function MainPage({ accessToken, stats, loading, error }: { accessToken: string | null; stats: any; loading: boolean; error: string | null }) {
     const navigate = useNavigate();
 
     const handleConnect = () => {
