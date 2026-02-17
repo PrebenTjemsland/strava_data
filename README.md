@@ -74,7 +74,7 @@ VITE_API_BASE_URL=http://localhost:5050
 
 GitHub Actions now builds with these defaults:
 
-- `VITE_BASE_PATH=/strava-data/`
+- `VITE_BASE_PATH=/`
 - `VITE_API_BASE_URL=https://penten.duckdns.org`
 
 If you want another subpath (for example `/qbit-st/`) or another API host, set repository variables:
