@@ -2,7 +2,7 @@
     display: grid;
     /* This creates responsive columns. They will be at least 380px wide,
        and the grid will fit as many as possible before wrapping to the next line. */
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 2rem; /* This is the correct way to add space between grid items */
 }
 
@@ -89,7 +89,7 @@
 @media (max-width: 820px) {
     .stats-grid {
        /* Adjust the minimum card width on smaller screens to allow for better wrapping */
-       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
 }
 

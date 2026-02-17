@@ -2,20 +2,24 @@ import { useNavigate } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import './styles/Button.css';
 import './styles/Stats.css';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, type TooltipItem } from 'chart.js';
+import { apiUrl, FRONTEND_REDIRECT_URL } from './lib/api';
+import type { StravaAthleteStats } from './types/strava';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function MainPage({ accessToken, stats, loading, error }: { accessToken: string | null; stats: any; loading: boolean; error: string | null }) {
+type MainPageProps = {
+    accessToken: string | null;
+    stats: StravaAthleteStats | null;
+    loading: boolean;
+    error: string | null;
+};
+
+function MainPage({ accessToken, stats, loading, error }: MainPageProps) {
     const navigate = useNavigate();
 
     const handleConnect = () => {
-        let backendBase = window.location.origin;
-        if (backendBase.match(/:\d+$/)) {
-            backendBase = backendBase.replace(/:\d+$/, ':5050');
-        }
-        const frontendUrl = window.location.origin;
-        window.location.href = `${backendBase}/api/authorize?redirect_uri=${encodeURIComponent(frontendUrl)}`;
+        window.location.href = `${apiUrl('/api/authorize')}?redirect_uri=${encodeURIComponent(FRONTEND_REDIRECT_URL)}`;
     };
 
     const formatTime = (seconds: number | null | undefined) => {
@@ -158,7 +162,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string 
                                                 },
                                                 tooltip: {
                                                     callbacks: {
-                                                        label: (context: any) => `Distance: ${context.raw} km`,
+                                                        label: (context: TooltipItem<'bar'>) => `Distance: ${context.raw} km`,
                                                     },
                                                     titleFont: {
                                                         size: 16,
@@ -248,7 +252,7 @@ function MainPage({ accessToken, stats, loading, error }: { accessToken: string 
                                                 },
                                                 tooltip: {
                                                     callbacks: {
-                                                        label: (context: any) => `Distance: ${context.raw} km`,
+                                                        label: (context: TooltipItem<'bar'>) => `Distance: ${context.raw} km`,
                                                     },
                                                     titleFont: {
                                                         size: 16,

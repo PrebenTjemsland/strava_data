@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Activities from './Activities';
-import MainPage from './Mainpage';
-import AthletePage from './AthletePage';
+import { apiUrl } from './lib/api';
+import type { StravaAthleteStats } from './types/strava';
+
+const MainPage = lazy(() => import('./Mainpage'));
+const Activities = lazy(() => import('./Activities'));
+const AthletePage = lazy(() => import('./AthletePage'));
 
 type TokenData = {
     accessToken: string | null;
@@ -23,14 +26,9 @@ function App() {
     });
 
     const [athleteId, setAthleteId] = useState<string | null>(localStorage.getItem('athleteId'));
-    const [stats, setStats] = useState<any>(null);
+    const [stats, setStats] = useState<StravaAthleteStats | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    let backendBase = window.location.origin;
-    if (backendBase.match(/:\d+$/)) {
-        backendBase = backendBase.replace(/:\d+$/, ':5050');
-    }
 
     const clearAuthData = useCallback(() => {
         localStorage.removeItem('accessToken');
@@ -80,7 +78,7 @@ function App() {
             if (currentTokenData.accessToken && currentTokenData.expiresAt && Date.now() / 1000 > currentTokenData.expiresAt - 300) {
                 console.log('Access token expired, refreshing...');
                 try {
-                    const response = await fetch(`${backendBase}/api/refresh_token`, {
+                    const response = await fetch(apiUrl('/api/refresh_token'), {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ refresh_token: currentTokenData.refreshToken }),
@@ -116,7 +114,14 @@ function App() {
             }
 
             // Proceed with the original API call using the (possibly new) access token
-            const response = await fetch(`${url}&access_token=${currentTokenData.accessToken}`);
+            if (!currentTokenData.accessToken) {
+                throw new Error('Missing access token');
+            }
+
+            const requestUrl = new URL(url, window.location.origin);
+            requestUrl.searchParams.set('access_token', currentTokenData.accessToken);
+
+            const response = await fetch(requestUrl);
             if (!response.ok) {
                 if (response.status === 401) {
                     // Handle cases where the token is invalid for other reasons
@@ -127,7 +132,7 @@ function App() {
             }
             return response.json();
         },
-        [tokenData, backendBase, clearAuthData],
+        [tokenData, clearAuthData],
     );
 
     // This effect fetches stats when the component mounts or when a valid token is available
@@ -136,7 +141,7 @@ function App() {
             setLoading(true);
             setError(null);
 
-            const url = `${backendBase}/api/athlete_stats?athlete_id=${athleteId}`;
+            const url = apiUrl(`/api/athlete_stats?athlete_id=${athleteId}`);
 
             fetchWithRefresh(url)
                 .then((data) => {
@@ -144,10 +149,7 @@ function App() {
                 })
                 .catch((err) => {
                     console.error('Failed to fetch athlete stats:', err);
-                    if (!error) {
-                        // Only set error if not already set by fetchWithRefresh
-                        setError('Failed to fetch stats. Please try again.');
-                    }
+                    setError((currentError) => currentError ?? 'Failed to fetch stats. Please try again.');
                 })
                 .finally(() => setLoading(false));
         }
@@ -155,11 +157,13 @@ function App() {
 
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<MainPage accessToken={tokenData.accessToken} stats={stats} loading={loading} error={error} />} />
-                <Route path="/activities" element={<Activities accessToken={tokenData.accessToken} />} />
-                <Route path="/athlete" element={<AthletePage accessToken={tokenData.accessToken} stats={stats} />} />
-            </Routes>
+            <Suspense fallback={<p>Loading...</p>}>
+                <Routes>
+                    <Route path="/" element={<MainPage accessToken={tokenData.accessToken} stats={stats} loading={loading} error={error} />} />
+                    <Route path="/activities" element={<Activities accessToken={tokenData.accessToken} />} />
+                    <Route path="/athlete" element={<AthletePage accessToken={tokenData.accessToken} stats={stats} />} />
+                </Routes>
+            </Suspense>
         </Router>
     );
 }

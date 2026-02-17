@@ -33,7 +33,7 @@ Create a `.env` file in the `strava-backend` folder (do **not** commit this file
 ```
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
-STRAVA_REDIRECT_URI=http://localhost:5050/exchange_token
+STRAVA_REDIRECT_URI=http://localhost:5050/api/exchange_token
 ```
 
 You can copy `.env.example` as a template.
@@ -64,6 +64,24 @@ npm run dev
 
 Visit the URL shown in your terminal (usually http://localhost:5173).
 
+Optional frontend override (local/dev):
+
+```
+VITE_API_BASE_URL=http://localhost:5050
+```
+
+## Production Deploy (Subpath + API)
+
+GitHub Actions now builds with these defaults:
+
+- `VITE_BASE_PATH=/strava-data/`
+- `VITE_API_BASE_URL=https://penten.duckdns.org`
+
+If you want another subpath (for example `/qbit-st/`) or another API host, set repository variables:
+
+- `VITE_BASE_PATH`
+- `VITE_API_BASE_URL`
+
 ## Security
 
 -   **Never commit your `.env` file or secrets to git!**
@@ -86,7 +104,7 @@ Visit the URL shown in your terminal (usually http://localhost:5173).
 ```
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
-STRAVA_REDIRECT_URI=http://localhost:5050/exchange_token
+STRAVA_REDIRECT_URI=http://localhost:5050/api/exchange_token
 ```
 
 ## License

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { decode } from '@googlemaps/polyline-codec';
 import 'leaflet/dist/leaflet.css';
@@ -12,33 +12,43 @@ interface ActivityMapProps {
 const ActivityMap: React.FC<ActivityMapProps> = ({ polyline, startLatlng, endLatlng }) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
+    const layerGroupRef = useRef<L.LayerGroup | null>(null);
 
     useEffect(() => {
-        if (!mapRef.current || !polyline) return;
+        if (!mapRef.current || mapInstanceRef.current) return;
 
-        // Decode the polyline
-        const decodedPath = decode(polyline);
+        const map = L.map(mapRef.current);
+        mapInstanceRef.current = map;
 
-        // Create map if it doesn't exist
-        if (!mapInstanceRef.current) {
-            mapInstanceRef.current = L.map(mapRef.current);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+        }).addTo(map);
 
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-            }).addTo(mapInstanceRef.current);
-        }
+        layerGroupRef.current = L.layerGroup().addTo(map);
+
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+                layerGroupRef.current = null;
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!polyline || !mapInstanceRef.current || !layerGroupRef.current) return;
 
         const map = mapInstanceRef.current;
+        const layers = layerGroupRef.current;
+        const decodedPath = decode(polyline);
+        layers.clearLayers();
 
-        // Create and add the polyline
         const path = L.polyline(decodedPath, {
             color: '#fc4c02',
             weight: 3,
             opacity: 0.8,
-        }).addTo(map);
+        }).addTo(layers);
 
-        // Add start and end markers if available
         if (startLatlng) {
             L.marker(startLatlng, {
                 title: 'Start',
@@ -47,7 +57,7 @@ const ActivityMap: React.FC<ActivityMapProps> = ({ polyline, startLatlng, endLat
                     html: '🟢',
                     iconSize: [20, 20],
                 }),
-            }).addTo(map);
+            }).addTo(layers);
         }
 
         if (endLatlng) {
@@ -58,24 +68,15 @@ const ActivityMap: React.FC<ActivityMapProps> = ({ polyline, startLatlng, endLat
                     html: '🏁',
                     iconSize: [20, 20],
                 }),
-            }).addTo(map);
+            }).addTo(layers);
         }
 
-        // Fit the map to the polyline bounds
         map.fitBounds(path.getBounds(), {
             padding: [30, 30],
         });
-
-        // Cleanup function
-        return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-            }
-        };
     }, [polyline, startLatlng, endLatlng]);
 
     return <div ref={mapRef} style={{ height: '300px', width: '100%', borderRadius: '8px' }} />;
 };
 
-export default ActivityMap;
+export default memo(ActivityMap);

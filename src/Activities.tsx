@@ -3,58 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import './Activities.css';
 import './styles/Button.css';
 import ActivityMap from './components/ActivityMap';
-
-interface ActivityMap {
-    id: string;
-    summary_polyline: string;
-    resource_state: number;
-}
-
-interface Activity {
-    id: number;
-    name: string;
-    type: string;
-    sport_type: string;
-    distance: number;
-    moving_time: number;
-    total_elevation_gain: number;
-    start_date: string;
-    achievement_count: number;
-    kudos_count: number;
-    average_speed: number;
-    max_speed: number;
-    has_heartrate: boolean;
-    average_heartrate?: number;
-    max_heartrate?: number;
-    average_watts?: number;
-    pr_count: number;
-    map: ActivityMap;
-    start_latlng?: [number, number];
-    end_latlng?: [number, number];
-}
+import { apiUrl } from './lib/api';
+import type { StravaActivity } from './types/strava';
 
 function Activities({ accessToken }: { accessToken: string | null }) {
-    const [activities, setActivities] = useState<any[]>([]);
+    const [activities, setActivities] = useState<StravaActivity[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    let backendBase = window.location.origin;
-    if (backendBase.match(/:\d+$/)) {
-        backendBase = backendBase.replace(/:\d+$/, ':5050');
-    }
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!accessToken) return;
+
+        const controller = new AbortController();
         setLoading(true);
         setError(null);
-        fetch(`${backendBase}/api/activities?access_token=${accessToken}`)
+        fetch(apiUrl(`/api/activities?access_token=${accessToken}`), { signal: controller.signal })
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch activities');
-                return res.json();
+                return res.json() as Promise<StravaActivity[]>;
             })
             .then((data) => setActivities(data))
-            .catch((err) => setError(err.message))
+            .catch((err: unknown) => {
+                if (controller.signal.aborted) return;
+                setError(err instanceof Error ? err.message : 'Failed to fetch activities');
+            })
             .finally(() => setLoading(false));
+
+        return () => controller.abort();
     }, [accessToken]);
 
     const formatDuration = (seconds: number) => {
@@ -64,6 +40,7 @@ function Activities({ accessToken }: { accessToken: string | null }) {
     };
 
     const formatPace = (speedMps: number) => {
+        if (!speedMps) return 'N/A';
         const pacePerKm = 1000 / (speedMps * 60);
         const minutes = Math.floor(pacePerKm);
         const seconds = Math.round((pacePerKm - minutes) * 60);
@@ -83,7 +60,7 @@ function Activities({ accessToken }: { accessToken: string | null }) {
             {error && <div className="error">{error}</div>}
 
             <ul className="activity-list">
-                {activities.map((activity: Activity) => (
+                {activities.map((activity) => (
                     <li key={activity.id} className="activity-card">
                         <div className="activity-title">
                             <span className={`activity-type-badge activity-type-${activity.type}`}>{activity.type}</span>

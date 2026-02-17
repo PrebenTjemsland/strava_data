@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import './AthletePage.css';
 import './styles/Button.css';
 import GearImageUpload from './components/GearImageUpload';
+import { apiUrl } from './lib/api';
+import type { StravaAthleteStats } from './types/strava';
 
 interface Athlete {
     id: number;
@@ -28,33 +30,47 @@ interface Athlete {
     }>;
 }
 
-const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ accessToken, stats }) => {
+const AthletePage: React.FC<{ accessToken: string | null; stats: StravaAthleteStats | null }> = ({ accessToken, stats }) => {
     const [athlete, setAthlete] = React.useState<Athlete | null>(null);
     const [loading, setLoading] = React.useState(true);
+    const [loadError, setLoadError] = React.useState<string | null>(null);
 
     const [gearImages, setGearImages] = React.useState<Array<{ gearId: string; imageUrl: string }>>(() => {
         const saved = localStorage.getItem('gearImages') || sessionStorage.getItem('gearImages');
-        return saved ? JSON.parse(saved) : [];
+        if (!saved) return [];
+        try {
+            return JSON.parse(saved) as Array<{ gearId: string; imageUrl: string }>;
+        } catch {
+            return [];
+        }
     });
     const [storageError, setStorageError] = React.useState<string | null>(null);
 
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        if (!accessToken) return;
-
-        let backendBase = window.location.origin;
-        if (backendBase.match(/:\d+$/)) {
-            backendBase = backendBase.replace(/:\d+$/, ':5050');
+        if (!accessToken) {
+            setLoading(false);
+            return;
         }
 
-        fetch(`${backendBase}/api/athlete?access_token=${accessToken}`)
+        const controller = new AbortController();
+        setLoadError(null);
+
+        fetch(apiUrl(`/api/athlete?access_token=${accessToken}`), { signal: controller.signal })
             .then((res) => {
                 if (!res.ok) throw new Error('Failed to fetch stats');
-                return res.json();
+                return res.json() as Promise<Athlete>;
             })
             .then((data) => setAthlete(data))
+            .catch((err: unknown) => {
+                if (controller.signal.aborted) return;
+                const message = err instanceof Error ? err.message : 'Failed to load athlete data';
+                setLoadError(message);
+            })
             .finally(() => setLoading(false));
+
+        return () => controller.abort();
     }, [accessToken]);
 
     if (loading) {
@@ -62,7 +78,7 @@ const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ acc
     }
 
     if (!athlete) {
-        return <div>Error loading athlete data</div>;
+        return <div>{loadError ?? 'Error loading athlete data'}</div>;
     }
 
     const handleImageUpload = (gearId: string, imageUrl: string) => {
@@ -71,13 +87,13 @@ const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ acc
             // Try to persist to localStorage, but handle quota errors gracefully
             try {
                 localStorage.setItem('gearImages', JSON.stringify(newImages));
-            } catch (e: any) {
+            } catch (e: unknown) {
                 console.warn('Failed to persist gearImages to localStorage:', e);
                 try {
                     // Fallback to sessionStorage
                     sessionStorage.setItem('gearImages', JSON.stringify(newImages));
                     setStorageError('Local storage full — saved for this session only.');
-                } catch (e2) {
+                } catch (e2: unknown) {
                     console.warn('Failed to persist gearImages to sessionStorage:', e2);
                     setStorageError('Unable to save images in browser storage. They will not persist after reload.');
                 }
@@ -118,7 +134,6 @@ const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ acc
     };
     const formattedActivityTime = formatActivityTime(totalActivityTime);
 
-    console.log('%c ##Custom log:', 'color: #bada55;', 'athlete --->', athlete);
     return (
         <div className="athlete-page">
             <div className="athlete-header">
@@ -128,7 +143,7 @@ const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ acc
                 <button onClick={() => navigate('/')} className="modern-button">
                     ← Back
                 </button>
-                {storageError && <div style={{ color: 'tomato', marginTop: '0.5rem' }}>{storageError}</div>}
+                {storageError && <div className="storage-error">{storageError}</div>}
             </div>
 
             <div className="athlete-stats">
@@ -139,7 +154,7 @@ const AthletePage: React.FC<{ accessToken: string | null; stats: any }> = ({ acc
                         <p>{`${(totalDistance / 1000).toFixed(1)} km`}</p>
                     </div>
                     <div className="stat-item">
-                        <h3>Total Activeties</h3>
+                        <h3>Total Activities</h3>
                         <p>{totalActivities}</p>
                     </div>
                     <div className="stat-item">
